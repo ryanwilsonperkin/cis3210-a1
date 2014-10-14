@@ -58,6 +58,24 @@ void get_user_input(char **filename, char *nodename)
     *nodename = nodename_buffer[1];
 }
 
+/*
+ * should_quit
+ *  Gets user input to decide whether to quit.
+ *
+ *  returns: 1 if program should quit, 0 otherwise
+ */
+int should_quit()
+{
+    char response = '\0';
+
+    do {
+        printf("Continue? (Y/N) ");
+        scanf(" %c", &response);
+    } while (response != 'Y' && response != 'N');
+
+    return (response == 'N') ? 1 : 0;
+}
+
 int main(int argc, char *argv[])
 {
     return 0;
