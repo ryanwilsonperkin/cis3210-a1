@@ -36,4 +36,15 @@ int send_packet(int destination_fd, packet p);
  */
 int recv_packet(int source_fd, packet *p);
 
+/*
+ * get_link
+ *  Open a link to send data from source node to dest node.
+ *
+ *  source: id of the source node (1-7)
+ *  dest: id of the destination node (1-7)
+ *
+ *  returns: the file descriptor of the opened link, -1 if no link exists
+ */
+int get_link(int source, int dest);
+
 #endif // CIS3210_A1_PACKET_H

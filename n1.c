@@ -1,4 +1,3 @@
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -79,29 +78,7 @@ int main(int argc, char *argv[])
     do {
         get_user_input(&filename, &node);
         n_chars = get_file_contents(filename, &contents);
-        switch (node) {
-            case 2:
-                write_fd = open("link1", O_WRONLY);
-                break;
-            case 3:
-                write_fd = open("link2", O_WRONLY);
-                break;
-            case 4:
-                write_fd = open("link3", O_WRONLY);
-                break;
-            case 5:
-                write_fd = open("link4", O_WRONLY);
-                break;
-            case 6:
-                write_fd = open("link5", O_WRONLY);
-                break;
-            case 7:
-                write_fd = open("link6", O_WRONLY);
-                break;
-            default:
-                fprintf(stderr, "error: not a valid nodename.\n");
-                continue;
-        }
+        write_fd = get_link(1, node);
 
         p.dest = (char)node;
         for (int i = 0; i < n_chars; i++) {
@@ -112,30 +89,7 @@ int main(int argc, char *argv[])
         send_packet(write_fd, p);
         close(write_fd);
 
-        switch (node) {
-            case 2:
-                read_fd = open("link1", O_RDONLY);
-                break;
-            case 3:
-                read_fd = open("link2", O_RDONLY);
-                break;
-            case 4:
-                read_fd = open("link3", O_RDONLY);
-                break;
-            case 5:
-                read_fd = open("link4", O_RDONLY);
-                break;
-            case 6:
-                read_fd = open("link5", O_RDONLY);
-                break;
-            case 7:
-                read_fd = open("link6", O_RDONLY);
-                break;
-            default:
-                fprintf(stderr, "error: not a valid nodename.\n");
-                continue;
-        }
-
+        read_fd = get_link(node, 1);
         recv_packet(read_fd, &p);
 
         quit = should_quit();
