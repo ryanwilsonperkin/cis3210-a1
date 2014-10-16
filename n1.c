@@ -1,8 +1,7 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include "packet.h"
@@ -68,31 +67,62 @@ int should_quit()
     return (response == 'N') ? 1 : 0;
 }
 
+/*
+ * send_data
+ *  Send characters of data to a node.
+ *
+ *  node: the node to send the data to
+ *  n_chars: the number of characters in the data
+ *  data: the data to send to the node
+ */
+void send_data(int node, int n_chars, char *data)
+{
+    packet p;
+    int link = get_link(1, node);
+
+    p.dest = (char) node;
+    for (int i = 0; i < n_chars; i++) {
+        p.data = data[i];
+        send_packet(link, p);
+    }
+
+    p.data = END_OF_TEXT;
+    send_packet(link, p);
+    close(link);
+}
+
 int main(int argc, char *argv[])
 {
     char *filename, *contents;
     long n_chars;
-    int node, quit, write_fd, read_fd;
+    int link, node, quit;
     packet p;
 
     do {
         get_user_input(&filename, &node);
         n_chars = get_file_contents(filename, &contents);
-        write_fd = get_link(1, node);
+        send_data(node, n_chars, contents);
 
-        p.dest = (char)node;
-        for (int i = 0; i < n_chars; i++) {
-            p.data = contents[i];
-            send_packet(write_fd, p);
-        }
-        p.data = '\0';
-        send_packet(write_fd, p);
-        close(write_fd);
-
-        read_fd = get_link(node, 1);
-        recv_packet(read_fd, &p);
+        link = get_link(node, 1);
+        recv_packet(link, &p);
+        assert(p.data == ACKNOWLEDGE);
+        close(link);
 
         quit = should_quit();
+        if (quit) {
+            p.data = END_OF_TRANSMISSION;
+            for (int i = 1; i < 7; i++) {
+                link = get_link(1, i);
+                p.dest = (char) i;
+                send_packet(node, p);
+                close(link);
+
+                link = get_link(i, 1);
+                recv_packet(link, &p);
+                assert(p.data == ACKNOWLEDGE);
+                close(link);
+            }
+        }
         free(filename);
         free(contents);
     } while(!quit);

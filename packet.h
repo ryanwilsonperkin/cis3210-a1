@@ -1,6 +1,10 @@
 #ifndef CIS3210_A1_PACKET_H
 #define CIS3210_A1_PACKET_H
 
+#define END_OF_TEXT         3
+#define END_OF_TRANSMISSION 4
+#define ACKNOWLEDGE         6
+
 /*
  * packet
  *  A packet of data sent between nodes.
