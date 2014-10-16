@@ -1,7 +1,12 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
+
+#include "packet.h"
 
 #define MAX_BUF_SIZE 1024
 
@@ -38,24 +43,15 @@ long get_file_contents(char *filename, char **contents)
  *  filename: pointer to string to allocate and fill with file name
  *  nodename: pointer to character to assign to node name (one of '1' - '7')
  */
-void get_user_input(char **filename, char *nodename)
+void get_user_input(char **filename, int *node)
 {
-    char filename_buffer[MAX_BUF_SIZE] = {'\0'}, nodename_buffer[MAX_BUF_SIZE] = {'\0'};
-    do {
-        printf("Enter a file name and destination node: ");
-        scanf(" %s %s", filename_buffer, nodename_buffer);
+    char filename_buffer[MAX_BUF_SIZE] = {'\0'};
 
-        if (!(nodename_buffer[1] >= '1' && nodename_buffer[1] <= '6')) {
-            fprintf(stderr, "error: %s is not a valid destination node.\n", nodename_buffer);
-        }
-        if (access(filename_buffer, R_OK) == -1) {
-            fprintf(stderr, "error: could not read from %s\n", filename_buffer);
-        }
-    } while (!(nodename_buffer[1] >= '2' && nodename_buffer[1] <= '7') || access(filename_buffer, R_OK) == -1);
+    printf("Enter a file name and destination node: ");
+    scanf(" %s n%d", filename_buffer, node);
 
     *filename = malloc(strlen(filename_buffer));
     *filename = strcpy(*filename, filename_buffer);
-    *nodename = nodename_buffer[1];
 }
 
 /*
@@ -67,16 +63,84 @@ void get_user_input(char **filename, char *nodename)
 int should_quit()
 {
     char response = '\0';
-
-    do {
-        printf("Continue? (Y/N) ");
-        scanf(" %c", &response);
-    } while (response != 'Y' && response != 'N');
+    printf("Continue? (Y/N) ");
+    scanf(" %c", &response);
 
     return (response == 'N') ? 1 : 0;
 }
 
 int main(int argc, char *argv[])
 {
+    char *filename, *contents;
+    long n_chars;
+    int node, quit, write_fd, read_fd;
+    packet p;
+
+    do {
+        get_user_input(&filename, &node);
+        n_chars = get_file_contents(filename, &contents);
+        switch (node) {
+            case 2:
+                write_fd = open("link1", O_WRONLY);
+                break;
+            case 3:
+                write_fd = open("link2", O_WRONLY);
+                break;
+            case 4:
+                write_fd = open("link3", O_WRONLY);
+                break;
+            case 5:
+                write_fd = open("link4", O_WRONLY);
+                break;
+            case 6:
+                write_fd = open("link5", O_WRONLY);
+                break;
+            case 7:
+                write_fd = open("link6", O_WRONLY);
+                break;
+            default:
+                fprintf(stderr, "error: not a valid nodename.\n");
+                continue;
+        }
+
+        p.dest = (char)node;
+        for (int i = 0; i < n_chars; i++) {
+            p.data = contents[i];
+            send_packet(write_fd, p);
+        }
+        p.data = '\0';
+        send_packet(write_fd, p);
+        close(write_fd);
+
+        switch (node) {
+            case 2:
+                read_fd = open("link1", O_RDONLY);
+                break;
+            case 3:
+                read_fd = open("link2", O_RDONLY);
+                break;
+            case 4:
+                read_fd = open("link3", O_RDONLY);
+                break;
+            case 5:
+                read_fd = open("link4", O_RDONLY);
+                break;
+            case 6:
+                read_fd = open("link5", O_RDONLY);
+                break;
+            case 7:
+                read_fd = open("link6", O_RDONLY);
+                break;
+            default:
+                fprintf(stderr, "error: not a valid nodename.\n");
+                continue;
+        }
+
+        recv_packet(read_fd, &p);
+
+        quit = should_quit();
+        free(filename);
+        free(contents);
+    } while(!quit);
     return 0;
 }
