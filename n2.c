@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
                 quit = 1;
             } else {
                 printf("%c", p.data);
+                fflush(stdout);
             }
         } else if (p.dest == 4) {
             link = get_link(2, 4);
