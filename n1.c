@@ -125,6 +125,6 @@ int main(int argc, char *argv[])
         }
         free(filename);
         free(contents);
-    } while(!quit);
+    } while (!quit);
     return 0;
 }
