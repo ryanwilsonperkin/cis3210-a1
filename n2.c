@@ -18,11 +18,11 @@ int get_child_index(int child_node)
 int main(int argc, char *argv[])
 {
     int read_parent, write_child[NUM_CHILDREN];
-    int quit;
     packet p;
 
-    read_parent = get_link(THIS_NODE, PARENT_NODE, READ);
+    read_parent = get_link(PARENT_NODE, THIS_NODE, READ);
     write_child[get_child_index(4)] = get_link(THIS_NODE, 4, WRITE);
+    fprintf(stderr, "read_parent: %d, write_child[0]: %d\n", read_parent, write_child[0]);fflush(stderr);
     while (1) {
         recv_packet(read_parent, &p);
         if (p.dest == THIS_NODE) {
