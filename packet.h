@@ -67,13 +67,13 @@ int get_link(int source, int dest, int mode);
 void send_data(int source, int dest, int n_chars, char *data);
 
 /*
- * acknowledge
+ * send_acknowledge
  *  Send acknowledge message from source to dest.
  *
  *  source: the node to send the acknowledge from
  *  dest: the node to send the acknowledge to
  */
-void acknowledge(int source, int dest);
+void send_acknowledge(int source, int dest);
 
 /*
  * recv_acknowledge

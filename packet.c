@@ -56,7 +56,7 @@ void send_data(int source, int dest, int n_chars, char *data)
     close(write_child);
 }
 
-void acknowledge(int source, int dest)
+void send_acknowledge(int source, int dest)
 {
     packet p;
     int link = get_link(source, dest, WRITE);

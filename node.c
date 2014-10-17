@@ -30,11 +30,11 @@ int branch_node(int this_node, int parent_node, int num_children, int children[M
         if (p.dest == this_node) {
             if (p.data == END_OF_TEXT) {
                 close(read_parent);
-                acknowledge(this_node, parent_node);
+                send_acknowledge(this_node, parent_node);
                 read_parent = get_link(this_node, parent_node, READ);
             } else if (p.data == END_OF_TRANSMISSION) {
                 close(read_parent);
-                acknowledge(this_node, parent_node);
+                send_acknowledge(this_node, parent_node);
                 return 0;
             } else {
                 printf("%c", p.data);
@@ -47,7 +47,7 @@ int branch_node(int this_node, int parent_node, int num_children, int children[M
                 close(read_parent);
                 close(write_child[child_index]);
                 recv_acknowledge(p.dest, this_node);
-                acknowledge(this_node, parent_node);
+                send_acknowledge(this_node, parent_node);
                 read_parent = get_link(parent_node, this_node, READ);
             }
             if (p.data == END_OF_TEXT) {
@@ -67,11 +67,11 @@ int leaf_node(int this_node, int parent_node)
         recv_packet(read_parent, &p);
         if (p.data == END_OF_TEXT) {
             close(read_parent);
-            acknowledge(this_node, parent_node);
+            send_acknowledge(this_node, parent_node);
             read_parent = get_link(this_node, parent_node, READ);
         } else if (p.data == END_OF_TRANSMISSION) {
             close(read_parent);
-            acknowledge(this_node, parent_node);
+            send_acknowledge(this_node, parent_node);
             return 0;
         } else {
             printf("%c", p.data);
