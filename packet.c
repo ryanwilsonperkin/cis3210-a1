@@ -1,13 +1,26 @@
 #include <assert.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "packet.h"
 
+#define DELAY_LOWER_BOUND 1
+#define DELAY_UPPER_BOUND 2000
+#define MICROS_PER_MILLI 1000
+
+void random_delay(int lower_bound, int upper_bound)
+{
+    int rnd = (rand() % (upper_bound - lower_bound)) + lower_bound;
+    usleep(rnd * MICROS_PER_MILLI);
+}
+
 int send_packet(int destination_fd, packet p)
 {
     char buffer[2] = {p.dest, p.data};
+    random_delay(DELAY_LOWER_BOUND, DELAY_UPPER_BOUND);
     int result = write(destination_fd, buffer, 2);
     return result;
 }
