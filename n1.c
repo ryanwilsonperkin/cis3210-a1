@@ -7,6 +7,7 @@
 #include "packet.h"
 
 #define MAX_BUF_SIZE 1024
+#define NUM_NODES 7
 
 /*
  * get_file_contents
@@ -39,7 +40,7 @@ long get_file_contents(char *filename, char **contents)
  *  Gets user input about which filename to read from and destination node to write to.
  *
  *  filename: pointer to string to allocate and fill with file name
- *  nodename: pointer to character to assign to node name (one of '1' - '7')
+ *  node: pointer to integer to read number into
  */
 void get_user_input(char **filename, int *node)
 {
@@ -67,64 +68,45 @@ int should_quit()
     return (response == 'N') ? 1 : 0;
 }
 
-/*
- * send_data
- *  Send characters of data to a node.
- *
- *  node: the node to send the data to
- *  n_chars: the number of characters in the data
- *  data: the data to send to the node
- */
-void send_data(int node, int n_chars, char *data)
-{
-    packet p;
-    int link = get_link(1, node);
-
-    p.dest = (char) node;
-    for (int i = 0; i < n_chars; i++) {
-        p.data = data[i];
-        send_packet(link, p);
-    }
-
-    p.data = END_OF_TEXT;
-    send_packet(link, p);
-    close(link);
-}
-
 int main(int argc, char *argv[])
 {
     char *filename, *contents;
     long n_chars;
-    int link, node, quit;
+    int write_child, read_child;
+    int node;
     packet p;
 
     do {
+        // Get filename and node number from user.
         get_user_input(&filename, &node);
+
+        // Get contents of file.
         n_chars = get_file_contents(filename, &contents);
-        send_data(node, n_chars, contents);
 
-        link = get_link(node, 1);
-        recv_packet(link, &p);
+        // Send file data to node.
+        send_data(1, node, n_chars, contents);
+
+        // Receive acknowledgement packet from node.
+        read_child = get_link(1, node, READ);
+        recv_packet(read_child, &p);
         assert(p.data == ACKNOWLEDGE);
-        close(link);
+        close(read_child);
 
-        quit = should_quit();
-        if (quit) {
-            p.data = END_OF_TRANSMISSION;
-            for (int i = 1; i < 7; i++) {
-                link = get_link(1, i);
-                p.dest = (char) i;
-                send_packet(node, p);
-                close(link);
-
-                link = get_link(i, 1);
-                recv_packet(link, &p);
-                assert(p.data == ACKNOWLEDGE);
-                close(link);
-            }
-        }
         free(filename);
         free(contents);
-    } while (!quit);
+    } while (!should_quit());
+
+    p.data = END_OF_TRANSMISSION;
+    for (int i = NUM_NODES; i > 1; i--) {
+        write_child = get_link(1, i, WRITE);
+        p.dest = i;
+        send_packet(node, p);
+        close(write_child);
+
+        read_child = get_link(1, i, READ);
+        recv_packet(read_child, &p);
+        assert(p.data == ACKNOWLEDGE);
+        close(read_child);
+    }
     return 0;
 }

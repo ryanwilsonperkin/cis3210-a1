@@ -3,43 +3,33 @@
 
 #include "packet.h"
 
+#define PARENT_NODE 1
+#define THIS_NODE 2
+
 int main(int argc, char *argv[])
 {
-    int link, quit;
+    int read_parent;
+    int quit;
     packet p;
 
     quit = 0;
+    read_parent = get_link(THIS_NODE, PARENT_NODE, READ);
     do {
-        link = get_link(2, 1);
-        recv_packet(link, &p);
-        close(link);
+        recv_packet(read_parent, &p);
         if (p.dest == 2) {
             if (p.data == END_OF_TEXT) {
-                p.dest = 1;
-                p.data = ACKNOWLEDGE;
-                link = get_link(1, 2);
-                send_packet(link, p);
-                close(link);
+                close(read_parent);
+                acknowledge(PARENT_NODE, THIS_NODE);
+                read_parent = get_link(THIS_NODE, PARENT_NODE, READ);
             } else if (p.data == END_OF_TRANSMISSION) {
-                p.dest = 1;
-                p.data = ACKNOWLEDGE;
-                link = get_link(1, 2);
-                send_packet(link, p);
-                close(link);
+                close(read_parent);
+                acknowledge(PARENT_NODE, THIS_NODE);
                 quit = 1;
             } else {
                 printf("%c", p.data);
                 fflush(stdout);
             }
         } else if (p.dest == 4) {
-            link = get_link(2, 4);
-            send_packet(link, p);
-            close(link);
-            if (p.data == END_OF_TEXT || p.data == END_OF_TRANSMISSION) {
-                link = get_link(1, 2);
-                send_packet(link, p);
-                close(link);
-            }
         }
     } while (!quit);
 }

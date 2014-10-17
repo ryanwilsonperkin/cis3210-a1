@@ -19,7 +19,7 @@ int recv_packet(int source_fd, packet *p)
     return result;
 }
 
-int get_link(int source, int dest)
+int get_link(int source, int dest, int mode)
 {
     int oflag;
     char link_name[6] = "link\0\0";
@@ -34,6 +34,33 @@ int get_link(int source, int dest)
     };
 
     link_name[4] = link_map[source - 1][dest - 1];
-    oflag = (source < dest) ? O_WRONLY : O_RDONLY;
+    oflag = (mode == WRITE) ? O_WRONLY : O_RDONLY;
     return open(link_name, oflag);
+}
+
+void send_data(int source, int dest, int n_chars, char *data)
+{
+    packet p;
+    int write_child = get_link(source, dest, WRITE);
+
+    p.dest = dest;
+    for (int i = 0; i < n_chars; i++) {
+        p.data = data[i];
+        send_packet(write_child, p);
+    }
+
+    p.data = END_OF_TEXT;
+    send_packet(write_child, p);
+    close(write_child);
+}
+
+void acknowledge(int source, int dest)
+{
+    packet p;
+    int link = get_link(source, dest, WRITE);
+
+    p.dest = dest;
+    p.data = ACKNOWLEDGE;
+    send_packet(link, p);
+    close(link);
 }
