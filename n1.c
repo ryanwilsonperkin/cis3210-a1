@@ -67,6 +67,11 @@ int should_quit()
     return (response == 'N') ? 1 : 0;
 }
 
+/*
+ * n1
+ *  Polls the user for the name of a file and a node.
+ *  Sends the file character by character to the node via special FIFO-based protocol.
+ */
 int main(int argc, char *argv[])
 {
     char *filename, *contents;
