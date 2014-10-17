@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -62,5 +63,14 @@ void acknowledge(int source, int dest)
     p.dest = dest;
     p.data = ACKNOWLEDGE;
     send_packet(link, p);
+    close(link);
+}
+
+void recv_acknowledge(int source, int dest)
+{
+    packet p;
+    int link = get_link(source, dest, READ);
+    recv_packet(link, &p);
+    assert(p.data == ACKNOWLEDGE);
     close(link);
 }

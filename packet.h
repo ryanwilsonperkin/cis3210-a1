@@ -75,4 +75,13 @@ void send_data(int source, int dest, int n_chars, char *data);
  */
 void acknowledge(int source, int dest);
 
+/*
+ * recv_acknowledge
+ *  Receive acknowledge message at dest from source.
+ *
+ *  source: the node that sends the acknowledge
+ *  dest: the node that receives the acknowledge
+ */
+void recv_acknowledge(int source, int dest)
+
 #endif // CIS3210_A1_PACKET_H

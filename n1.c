@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,10 +86,7 @@ int main(int argc, char *argv[])
         send_data(1, node, n_chars, contents);
 
         // Receive acknowledgement packet from node.
-        read_child = get_link(1, node, READ);
-        recv_packet(read_child, &p);
-        assert(p.data == ACKNOWLEDGE);
-        close(read_child);
+        recv_acknowledge(1, node);
 
         free(filename);
         free(contents);
@@ -103,10 +99,7 @@ int main(int argc, char *argv[])
         send_packet(write_child, p);
         close(write_child);
 
-        read_child = get_link(1, i, READ);
-        recv_packet(read_child, &p);
-        assert(p.data == ACKNOWLEDGE);
-        close(read_child);
+        recv_acknowledge(i, 1);
     }
     return 0;
 }
