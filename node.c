@@ -44,9 +44,11 @@ int branch_node(int this_node, int parent_node, int num_children, int children[M
             child_index = get_child_index(p.dest, num_children, children);
             send_packet(write_child[child_index], p);
             if (p.data == END_OF_TEXT || p.data == END_OF_TRANSMISSION) {
+                close(read_parent);
                 close(write_child[child_index]);
                 recv_acknowledge(p.dest, this_node);
                 acknowledge(this_node, parent_node);
+                read_parent = get_link(parent_node, this_node, READ);
             }
             if (p.data == END_OF_TEXT) {
                 write_child[child_index] = get_link(this_node, p.dest, WRITE);

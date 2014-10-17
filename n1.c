@@ -93,14 +93,13 @@ int main(int argc, char *argv[])
     } while (!should_quit());
 
     p.data = END_OF_TRANSMISSION;
-    int temp[2] = {4,2};
-    for (int i = 0; i < 2; i++) {
-        write_child = get_link(1, temp[i], WRITE);
-        p.dest = temp[i];
+    for (int i = NUM_NODES; i > 1; i--) {
+        write_child = get_link(1, i, WRITE);
+        p.dest = i;
         send_packet(write_child, p);
         close(write_child);
 
-        recv_acknowledge(temp[i], 1);
+        recv_acknowledge(1, i);
     }
     return 0;
 }
