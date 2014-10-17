@@ -14,6 +14,15 @@ run: build
 
 build: n1 n2 n3 n4 n5 n6 n7
 
+links: 
+	mkfifo link1
+	mkfifo link2
+	mkfifo link3
+	mkfifo link4
+	mkfifo link5
+	mkfifo link6
+	mkfifo link7
+
 n1: node.o packet.o n1.c
 	$(CC) $(CFLAGS) node.o packet.o n1.c -o n1
 
