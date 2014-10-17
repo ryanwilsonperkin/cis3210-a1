@@ -92,6 +92,7 @@ int main(int argc, char *argv[])
         free(contents);
     } while (!should_quit());
 
+    // Send exit message to all child nodes.
     p.data = END_OF_TRANSMISSION;
     for (int i = NUM_NODES; i > 1; i--) {
         write_child = get_link(1, i, WRITE);
