@@ -19,11 +19,11 @@ int main(int argc, char *argv[])
         if (p.dest == 2) {
             if (p.data == END_OF_TEXT) {
                 close(read_parent);
-                acknowledge(PARENT_NODE, THIS_NODE);
+                acknowledge(THIS_NODE, PARENT_NODE);
                 read_parent = get_link(THIS_NODE, PARENT_NODE, READ);
             } else if (p.data == END_OF_TRANSMISSION) {
                 close(read_parent);
-                acknowledge(PARENT_NODE, THIS_NODE);
+                acknowledge(THIS_NODE, PARENT_NODE);
                 quit = 1;
             } else {
                 printf("%c", p.data);

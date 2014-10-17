@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     for (int i = NUM_NODES; i > 1; i--) {
         write_child = get_link(1, i, WRITE);
         p.dest = i;
-        send_packet(node, p);
+        send_packet(write_child, p);
         close(write_child);
 
         read_child = get_link(1, i, READ);
