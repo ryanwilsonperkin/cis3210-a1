@@ -1,7 +1,18 @@
 CC = gcc
 CFLAGS = -Wall -std=c99
 
-all: n1 n2 n3 n4 n5 n6 n7
+all: build
+
+run: build
+	./n7&
+	./n6&
+	./n5&
+	./n4&
+	./n3&
+	./n2&
+	./n1
+
+build: n1 n2 n3 n4 n5 n6 n7
 
 n1: node.o packet.o n1.c
 	$(CC) $(CFLAGS) node.o packet.o n1.c -o n1
