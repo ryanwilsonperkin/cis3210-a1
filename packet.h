@@ -82,6 +82,6 @@ void acknowledge(int source, int dest);
  *  source: the node that sends the acknowledge
  *  dest: the node that receives the acknowledge
  */
-void recv_acknowledge(int source, int dest)
+void recv_acknowledge(int source, int dest);
 
 #endif // CIS3210_A1_PACKET_H
