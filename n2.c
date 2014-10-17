@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
                 close(write_child[get_child_index(p.dest)]);
                 recv_acknowledge(p.dest, THIS_NODE);
                 acknowledge(THIS_NODE, PARENT_NODE);
+            }
+            if (p.data == END_OF_TEXT) {
                 write_child[get_child_index(p.dest)] = get_link(THIS_NODE, p.dest, WRITE);
             }
         }
